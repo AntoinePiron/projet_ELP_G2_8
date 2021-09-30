@@ -1,4 +1,4 @@
-# Séance 1 #
+# Séance 1 
 mail prof : pierre.francois@insa-lyon.fr
 Projet :
     - groupe de 3 de preference mixtes
@@ -11,7 +11,7 @@ Objectif de cette séance :
     - Créer un repo git
     - Préparer le mail 
 
-## Notre groupe : GR2-8 ##
+## Notre groupe : GR2-8 
 Piste de recherche :
     - Traitement d'image
     - Compression/amélioration qualité d'image
