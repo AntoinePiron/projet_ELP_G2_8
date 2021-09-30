@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/jpeg"
 	"log"
 	"os"
+	"time"
 )
 
 type ImageSet interface {
@@ -13,6 +15,7 @@ type ImageSet interface {
 }
 
 func main() {
+	startTime := time.Now()
 	file, err := os.Open("koala.jpg")
 	if err != nil {
 		log.Fatal(err)
@@ -43,5 +46,6 @@ func main() {
 	}
 	defer outFile.Close()
 	jpeg.Encode(outFile, imgSet, nil)
-
+	durationTime := time.Since(startTime)
+	fmt.Print(durationTime)
 }
