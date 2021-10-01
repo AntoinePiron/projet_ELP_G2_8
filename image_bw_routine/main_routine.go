@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/jpeg"
+	"log"
+	"os"
 	"time"
 )
 
@@ -25,7 +28,17 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.YCbCr,
 
 func main() {
 	startTime := time.Now()
-	fmt.Println("Hello")
+	file, err := os.Open("koala.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	img, err := jpeg.Decode(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	totalTime := time.Since(startTime)
 	fmt.Println("Durée totale : " + totalTime.String())
 }
