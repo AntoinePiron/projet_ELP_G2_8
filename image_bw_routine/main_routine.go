@@ -14,7 +14,7 @@ import (
 Cette fonction va nous permettre d'analyser un bout de l'image à l'intérieur de la zone donnée par l'utilisateur
 On indique également le fichier d'entrée et de sortie
 */
-func analyze(upleftx int, uplefty int, width int, height int, input image.Image) {
+func analyze(upleftx int, uplefty int, width int, height int, input image.Image, final chan image.Image) {
 	bounds := image.Rect(upleftx, uplefty, width, height)
 	output := image.NewRGBA(bounds)
 
@@ -27,13 +27,7 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image)
 			output.Set(x, y, pixel)
 		}
 	}
-
-	outFile, err := os.Create("changed.jpg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer outFile.Close()
-	jpeg.Encode(outFile, output, nil)
+	final <- output
 }
 
 func main() {
@@ -49,7 +43,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	analyze(0, 0, img.Bounds().Dx(), img.Bounds().Dy(), img)
+	finalImg := make(chan image.Image)
+
+	go analyze(0, 0, img.Bounds().Dx(), img.Bounds().Dy(), img, finalImg)
+
+	outFile, err := os.Create("changed.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer outFile.Close()
+	outputIMG := <-finalImg
+	jpeg.Encode(outFile, outputIMG, nil)
 
 	totalTime := time.Since(startTime)
 	fmt.Println("Durée totale : " + totalTime.String())
