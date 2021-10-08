@@ -23,9 +23,7 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 			r, g, b, _ := oldPixel.RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
 			pixel := color.Gray{uint8(lum / 256)}
-			m.Lock()
 			final.Set(x, y, pixel)
-			m.Unlock()
 		}
 	}
 	wg.Done()
@@ -34,8 +32,6 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 func main() {
 	var wg sync.WaitGroup
 	var m sync.Mutex
-
-	startTime := time.Now()
 	file, err := os.Open("testFAT.JPG")
 	if err != nil {
 		log.Fatal(err)
@@ -48,9 +44,10 @@ func main() {
 	}
 
 	finalImg := image.NewRGBA(img.Bounds())
-	const nbDiv = 2
+	const nbDiv = 4
 	x := img.Bounds().Max.X / nbDiv
 	y := img.Bounds().Max.Y / nbDiv
+	startTime := time.Now()
 	for i := 0; i < nbDiv; i++ {
 		for j := 0; j < nbDiv; j++ {
 			wg.Add(1)
@@ -58,6 +55,8 @@ func main() {
 		}
 	}
 	wg.Wait()
+	totalTime := time.Since(startTime)
+	fmt.Println("Durée totale : " + totalTime.String())
 
 	outFile, err := os.Create("changed.jpg")
 	if err != nil {
@@ -65,7 +64,4 @@ func main() {
 	}
 	defer outFile.Close()
 	jpeg.Encode(outFile, finalImg, nil)
-
-	totalTime := time.Since(startTime)
-	fmt.Println("Durée totale : " + totalTime.String())
 }
