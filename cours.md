@@ -5,11 +5,11 @@ Projet :
     - A la fin de chaque cours bilan, même minime, au prof par mail avec objet specifique : [GO] GR2-<numProjet> etc
 
 Objectif de cette séance :
-    - Installation GO
-    - Formation du groupe
-    - Programme qui ouvre un fichier, lire le fichier et afficher à l'écran les derniers mots de chaque ligne 
-    - Créer un repo git
-    - Préparer le mail 
+    1. Installation GO
+    2. Formation du groupe
+    3. Programme qui ouvre un fichier, lire le fichier et afficher à l'écran les derniers mots de chaque ligne 
+    4. Créer un repo git
+    5. Préparer le mail 
 
 ## Notre groupe : GR2-8 
 Piste de recherche :
