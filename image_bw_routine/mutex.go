@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
 	"image/jpeg"
 	"log"
 	"os"
@@ -17,7 +16,6 @@ Cette fonction va nous permettre d'analyser un bout de l'image à l'intérieur d
 On indique également le fichier d'entrée et de sortie
 */
 func analyze(upleftx int, uplefty int, width int, height int, input image.Image, final *image.RGBA, wg *sync.WaitGroup, m *sync.Mutex) {
-	output := image.NewRGBA(input.Bounds())
 
 	for x := upleftx; x < upleftx+width; x++ {
 		for y := uplefty; y < uplefty+height; y++ {
@@ -25,12 +23,12 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 			r, g, b, _ := oldPixel.RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
 			pixel := color.Gray{uint8(lum / 256)}
-			output.Set(x, y, pixel)
+			//output.Set(x, y, pixel)
+			m.Lock()
+			final.Set(x, y, pixel)
+			m.Unlock()
 		}
 	}
-	m.Lock()
-	draw.DrawMask(final, final.Bounds(), output, image.ZP, final.Bounds(), image.ZP, draw.Over)
-	m.Unlock()
 	wg.Done()
 }
 
