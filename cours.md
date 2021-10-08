@@ -20,3 +20,7 @@ Premier travail : tranformer une image en noir et blanc
 
 A voir pour go routine -> systeme de canal
 Sinon plusieurs go routine qui ecrive dans le meme fichier mais il faut verifier si il est thread safe -> mutex
+
+## Bilan test image 6000x4000
+Sans go routines : 2,75 secondes
+

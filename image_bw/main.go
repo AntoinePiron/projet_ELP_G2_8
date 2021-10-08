@@ -17,7 +17,7 @@ type ImageSet interface {
 
 func main() {
 	startTime := time.Now()
-	file, err := os.Open("koala.jpg")
+	file, err := os.Open("testFAT.JPG")
 	if err != nil {
 		log.Fatal(err)
 	}

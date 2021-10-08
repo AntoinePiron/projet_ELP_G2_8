@@ -32,7 +32,7 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 
 func main() {
 	startTime := time.Now()
-	file, err := os.Open("koala.jpg")
+	file, err := os.Open("testFAT.JPG")
 	if err != nil {
 		log.Fatal(err)
 	}
