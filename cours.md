@@ -4,8 +4,8 @@
 ## Séance 1 
 mail prof : pierre.francois@insa-lyon.fr
 Projet :
-    - groupe de 3 de preference mixtes
-    - A la fin de chaque cours bilan, même minime, au prof par mail avec objet specifique : [GO] GR2-<numProjet> etc
+ - groupe de 3 de preference mixtes  
+ - A la fin de chaque cours bilan, même minime, au prof par mail avec objet specifique : [GO] GR2-<numProjet> etc  
 
 Objectif de cette séance :   
     1. Installation GO  
@@ -16,8 +16,8 @@ Objectif de cette séance :
 
 ## Notre groupe : GR2-8 
 Piste de recherche :   
-    - Traitement d'image   
-    - Compression/amélioration qualité d'image    
+ - Traitement d'image   
+ - Compression/amélioration qualité d'image    
 
 Premier travail : tranformer une image en noir et blanc    
 Réussite ! --> code dispo dans *image_bw/main.go*    
