@@ -23,7 +23,6 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 			r, g, b, _ := oldPixel.RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
 			pixel := color.Gray{uint8(lum / 256)}
-			//output.Set(x, y, pixel)
 			m.Lock()
 			final.Set(x, y, pixel)
 			m.Unlock()
@@ -49,12 +48,13 @@ func main() {
 	}
 
 	finalImg := image.NewRGBA(img.Bounds())
-	x := img.Bounds().Max.X / 2
-	y := img.Bounds().Max.Y / 2
-	for i := 0; i < 2; i++ {
-		for j := 0; j < 2; j++ {
+	const nbDiv = 2
+	x := img.Bounds().Max.X / nbDiv
+	y := img.Bounds().Max.Y / nbDiv
+	for i := 0; i < nbDiv; i++ {
+		for j := 0; j < nbDiv; j++ {
 			wg.Add(1)
-			go analyze(x*i, y*j, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg, &wg, &m)
+			go analyze(x*i, y*j, img.Bounds().Dx()/nbDiv, img.Bounds().Dy()/nbDiv, img, finalImg, &wg, &m)
 		}
 	}
 	wg.Wait()
