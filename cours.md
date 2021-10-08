@@ -1,4 +1,7 @@
-# Séance 1 
+# Suivi du projet
+*Le but de ce fichier est de suivre l'évolution de notre projet est d'en garder une trace écrite notamment pour les bilans*  
+
+## Séance 1 
 mail prof : pierre.francois@insa-lyon.fr
 Projet :
     - groupe de 3 de preference mixtes
@@ -22,7 +25,8 @@ Réussite ! --> code dispo dans *image_bw/main.go*
 A voir pour go routine -> systeme de canal    
 Sinon plusieurs go routine qui ecrive dans le meme fichier mais il faut verifier si il est thread safe -> mutex     
 
-## Bilan test image 6000x4000
+## Séance 2 (autonomie)
+On test notre programe avec/sans go routines pour une image en 6000x4000 donc plutot lourde.   
 Sans go routines : 2,75 secondes   
 Avec go routine : envrion 10 secondes    
 Conclusion : il y a un problème dans le code avec des go routines il va falloir trouver un moyen d'optimiser la chose   
