@@ -36,4 +36,8 @@ Début de reflexion :
 On est passé dans un premier temps sur un buffered channel -> gain de 2 secondes  
 On a ensuite essayé de créer un autre programme fonctionnant avec un système de mutex qui va directement écrire chaque pixel dans le fichier final on se retrouve avec un temps d'execution avoisinant les 4 secondes pour 4 subdivisions. Ce n'est toujours pas mieux que le programe sans go routines mais on s'améliore.  
 On a enfin réussi à rendre les go routines plus efficace !  
-Solutions ? Dans la go routine on utilisait un mutex qui bloquait à chaque écriture de pixel or cela n'est pas efficaace car il faudrait faire un blocage si jamais deux go routines tentent d'écrire au meme endroit ce qui n'est pas le cas pour nous : chaque go routines écrit dans des pixels différents donc pas de risque de collision.   
+Solutions ? Dans la go routine on utilisait un mutex qui bloquait à chaque écriture de pixel or cela n'est pas efficaace car il faudrait faire un blocage si jamais deux go routines tentent d'écrire au meme endroit ce qui n'est pas le cas pour nous : chaque go routines écrit dans des pixels différents donc pas de risque de collision.  
+Avec ces nouvelles modifications on obtient les résultats suivants (on ne compte que le temps de traitements de l'image on exclue le temps de lecture de l'input et de l'ecriture de l'output)  
+ - Sans go routine envrion 2 secondes   
+ - Avec go routine 400-410 ms avec 8 go routines  
+Donc gros gain apporté par les go routines.

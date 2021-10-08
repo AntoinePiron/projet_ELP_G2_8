@@ -43,7 +43,7 @@ func main() {
 	}
 
 	finalImg := image.NewRGBA(img.Bounds())
-	const nbDiv = 4
+	const nbDiv = 8
 	x := img.Bounds().Max.X / nbDiv
 	y := img.Bounds().Max.Y / nbDiv
 	startTime := time.Now()
