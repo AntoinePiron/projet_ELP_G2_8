@@ -17,7 +17,6 @@ Cette fonction va nous permettre d'analyser un bout de l'image à l'intérieur d
 On indique également le fichier d'entrée et de sortie
 */
 func analyze(upleftx int, uplefty int, width int, height int, input image.Image, final *image.RGBA, wg *sync.WaitGroup, m *sync.Mutex) {
-	m.Lock()
 	output := image.NewRGBA(input.Bounds())
 
 	for x := upleftx; x < upleftx+width; x++ {
@@ -29,6 +28,7 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 			output.Set(x, y, pixel)
 		}
 	}
+	m.Lock()
 	draw.DrawMask(final, final.Bounds(), output, image.ZP, final.Bounds(), image.ZP, draw.Over)
 	m.Unlock()
 	wg.Done()
@@ -52,10 +52,11 @@ func main() {
 
 	finalImg := image.NewRGBA(img.Bounds())
 	x := img.Bounds().Max.X / 2
+	y := img.Bounds().Max.Y / 2
 	for i := 0; i < 2; i++ {
 		for j := 0; j < 2; j++ {
 			wg.Add(1)
-			go analyze(x*i, x*j, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg, &wg, &m)
+			go analyze(x*i, y*j, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg, &wg, &m)
 		}
 	}
 	wg.Wait()

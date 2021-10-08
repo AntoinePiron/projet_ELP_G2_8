@@ -7,7 +7,6 @@ import (
 	"image/jpeg"
 	"log"
 	"os"
-	"reflect"
 	"time"
 )
 
@@ -24,7 +23,6 @@ func main() {
 	defer file.Close()
 
 	img, err := jpeg.Decode(file)
-	fmt.Println(reflect.TypeOf(img).String())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +30,6 @@ func main() {
 	b := img.Bounds()
 
 	imgSet := image.NewRGBA(b)
-	fmt.Println(reflect.TypeOf(imgSet).String())
 	for y := 0; y < b.Max.Y; y++ {
 		for x := 0; x < b.Max.X; x++ {
 			oldPixel := img.At(x, y)

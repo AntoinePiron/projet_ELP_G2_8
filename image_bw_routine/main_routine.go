@@ -32,7 +32,7 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 
 func main() {
 	startTime := time.Now()
-	file, err := os.Open("koala.jpg")
+	file, err := os.Open("testFAT.JPG")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,11 +45,12 @@ func main() {
 
 	finalImg := make(chan image.Image, 4)
 	x := img.Bounds().Max.X / 2
-
-	go analyze(0, 0, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg)
-	go analyze(x, 0, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg)
-	go analyze(0, x, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg)
-	go analyze(x, x, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg)
+	y := img.Bounds().Max.Y / 2
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 2; j++ {
+			go analyze(x*i, y*j, img.Bounds().Dx()/2, img.Bounds().Dy()/2, img, finalImg)
+		}
+	}
 
 	outFile, err := os.Create("changed.jpg")
 	if err != nil {
