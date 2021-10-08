@@ -15,7 +15,6 @@ type ImageSet interface {
 }
 
 func main() {
-	startTime := time.Now()
 	file, err := os.Open("testFAT.JPG")
 	if err != nil {
 		log.Fatal(err)
@@ -30,6 +29,7 @@ func main() {
 	b := img.Bounds()
 
 	imgSet := image.NewRGBA(b)
+	startTime := time.Now()
 	for y := 0; y < b.Max.Y; y++ {
 		for x := 0; x < b.Max.X; x++ {
 			oldPixel := img.At(x, y)
@@ -39,6 +39,8 @@ func main() {
 			imgSet.Set(x, y, pixel)
 		}
 	}
+	durationTime := time.Since(startTime)
+	fmt.Println("Durée totale : " + durationTime.String())
 
 	outFile, err := os.Create("changed.jpg")
 	if err != nil {
@@ -46,6 +48,4 @@ func main() {
 	}
 	defer outFile.Close()
 	jpeg.Encode(outFile, imgSet, nil)
-	durationTime := time.Since(startTime)
-	fmt.Println("Durée totale : " + durationTime.String())
 }
