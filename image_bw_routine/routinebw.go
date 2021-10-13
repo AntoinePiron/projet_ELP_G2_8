@@ -51,26 +51,40 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//On vient créer une image vide faisant la même taille que l'image d'orugine
+	//On vient créer une image vide faisant la même taille que l'image d'origine
 	finalImg := image.NewRGBA(img.Bounds())
+	//On va définir alors une constante correspondant au nombres de division souhaité cad le nb de go routines qu'on va lancer
 	const nbDiv = 8
+	//il s'agit ici de la longueur d'une sous section
 	x := img.Bounds().Max.X / nbDiv
+	//Il s'agit ici de la largeur d'une sous section
 	y := img.Bounds().Max.Y / nbDiv
+	//On va sauvegarder le tps avant l'execution des go routines pour voir le temps d'execution du programme
 	startTime := time.Now()
+	//Le double for va permettre de lancer les différentes go routines pour les sous segments
 	for i := 0; i < nbDiv; i++ {
 		for j := 0; j < nbDiv; j++ {
+			//On oublie pas d'ajouter au waitGroup
 			wg.Add(1)
+			//On lance notre go routine
 			go analyze(x*i, y*j, img.Bounds().Dx()/nbDiv, img.Bounds().Dy()/nbDiv, img, finalImg, &wg)
 		}
 	}
+	//Le wait va permettre d'eviter l'avancée du programme tant que toutes les go routines ne se sont pas executé
+	//Cela permet d'être sur que l'image est bien constitué en entier et au'on peut l'exporter
 	wg.Wait()
+
+	//On releve par ailleurs le temps total d'execution qu'on affiche
+	//On ne prend pas en compte le temps I/O qui ne dépend pas des go routines
 	totalTime := time.Since(startTime)
 	fmt.Println("Durée totale : " + totalTime.String())
 
+	//Finalement on genere notre fichier de sortie
 	outFile, err := os.Create("changed.jpg")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer outFile.Close()
+	//Et on le sort dans le bon format
 	jpeg.Encode(outFile, finalImg, nil)
 }
