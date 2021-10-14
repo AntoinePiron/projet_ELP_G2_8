@@ -14,6 +14,7 @@ func main() {
 		panic(err)
 	}
 	for {
+		fmt.Println("En attente de connection ...")
 		conn, errconn := ln.Accept() //On accepte la connection et on met l'identifiant de la session dans conn
 		//Cette ligne bloque le code tant qu'il n'y a pas de connectiom
 		if errconn != nil {
