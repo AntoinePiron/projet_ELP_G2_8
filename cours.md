@@ -122,3 +122,5 @@ func main(){
     }
 }
 ```
+On va alors adapter cela à notre code.
+Pour tranférer image &rarr; envoyer un go object pour se simplifier la vie. Le seul "inconvénient" est qu'il faut que le serveur et le client soient en golang. 
