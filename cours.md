@@ -124,4 +124,4 @@ func main(){
 ```
 On va alors adapter cela à notre code.      
 Pour tranférer image &rarr; envoyer un go object pour se simplifier la vie. Le seul "inconvénient" est qu'il faut que le serveur et le client soient en golang.   
-Aide posssible [ici](https://www.reddit.com/r/golang/comments/bddvx0/how_to_pass_a_struct_using_gob_encoding_over_a/)
+Pour se familiariser avec le transfer de structure on s'est alors basé sur le code disponible [ici](https://gist.github.com/MilosSimic/ae7fe8d70866e89dbd6e84d86dc8d8d5) qui nous a permis de comprendre comment envoyer une structure assez simple. Notre but va alors de bien comprendre et tranformer ce code afin de pouvoir tranférer des images sur le server TCP.   
