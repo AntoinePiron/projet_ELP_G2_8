@@ -3,49 +3,27 @@ package main
 import (
 	"fmt"
 	"net"
-	"os"
-)
-
-const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "3333"
-	CONN_TYPE = "tcp"
 )
 
 func main() {
-	// Listen for incoming connections.
-	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	const port = ":10000"
+	ln, err := net.Listen("tcp", port) //avec port le numéro du port, ln = listener
 	if err != nil {
-		fmt.Println("Error listening:", err.Error())
-		os.Exit(1)
+		fmt.Print("Problème lors de l'ouverture du serveur")
+		panic(err)
 	}
-	// Close the listener when the application closes.
-	defer l.Close()
-	fmt.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
 	for {
-		// Listen for an incoming connection.
-		conn, err := l.Accept()
-		if err != nil {
-			fmt.Println("Error accepting: ", err.Error())
-			os.Exit(1)
+		conn, errconn := ln.Accept() //On accepte la connection et on met l'identifiant de la session dans conn
+		//Cette ligne bloque le code tant qu'il n'y a pas de connectiom
+		if errconn != nil {
+			panic(errconn)
 		}
-		// Handle connections in a new goroutine.
-		go handleRequest(conn)
+		//On prend tout de suite en charge la connection
+		go handleConnection(conn)
 	}
 }
 
-// Handles incoming requests.
-func handleRequest(conn net.Conn) {
-	// Make a buffer to hold incoming data.
-	buf := make([]byte, 1024)
-	// Read the incoming connection into the buffer.
-	reqLen, err := conn.Read(buf)
-	_ = reqLen
-	if err != nil {
-		fmt.Println("Error reading:", err.Error())
-	}
-	// Send a response back to person contacting us.
-	conn.Write([]byte("Message received."))
-	// Close the connection when you're done with it.
-	conn.Close()
+func handleConnection(connection net.Conn) {
+	fmt.Print("Connection réussie")
+	connection.Close()
 }
