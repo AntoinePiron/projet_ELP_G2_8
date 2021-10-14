@@ -1,6 +1,5 @@
 package main
 
-//test 1-2-12
 import (
 	"fmt"
 	"net"
@@ -12,6 +11,8 @@ func main() {
 	if err != nil {
 		fmt.Print("Problème lors de l'ouverture du serveur")
 		panic(err)
+	} else {
+		fmt.Println("Ouverture du serveur réussie")
 	}
 	for {
 		fmt.Println("En attente de connection ...")
@@ -19,6 +20,8 @@ func main() {
 		//Cette ligne bloque le code tant qu'il n'y a pas de connectiom
 		if errconn != nil {
 			panic(errconn)
+		} else {
+			fmt.Print("Connection réussie")
 		}
 		//On prend tout de suite en charge la connection
 		go handleConnection(conn)
@@ -26,6 +29,7 @@ func main() {
 }
 
 func handleConnection(connection net.Conn) {
-	fmt.Print("Connection réussie")
+	fmt.Println("Dans handleConnection")
 	connection.Close()
+	fmt.Println("Sorti handleConnection")
 }
