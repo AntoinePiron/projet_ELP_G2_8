@@ -20,9 +20,9 @@ Piste de recherche :
  - Compression/amélioration qualité d'image    
 
 Premier travail : tranformer une image en noir et blanc    
-Réussite ! --> code dispo dans *image_bw/main.go*    
+Réussite ! &rarr; code dispo dans *image_bw/main.go*    
 
-A voir pour go routine -> systeme de canal    
+A voir pour go routine &rarr; systeme de canal    
 Sinon plusieurs go routine qui ecrive dans le meme fichier mais il faut verifier si il est thread safe -> mutex     
 
 ## Séance 2 (autonomie)
