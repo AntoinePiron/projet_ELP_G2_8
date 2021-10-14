@@ -74,8 +74,8 @@ func main (){
     for { //Boucle infinie pour traiter les clients 
         conn, errconn := ln.Accept() //On accepte la connection et on met l'identifiant de la session dans conn
         //Cette ligne bloque le code tant qu'il n'y a pas de connectiom
-        if errcon != nil {
-            panic(errcon)
+        if errconn != nil {
+            panic(errconn)
         }
         //On prend tout de suite en charge la connection
         go handleConnection(conn, connum)
