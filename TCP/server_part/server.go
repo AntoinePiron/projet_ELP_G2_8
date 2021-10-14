@@ -2,8 +2,15 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"net"
 )
+
+//On va se créer le go object qu'on va envoyer
+type ImgForConn struct {
+	id      int
+	content image.Image
+}
 
 func main() {
 	const port = ":10000"
@@ -29,7 +36,6 @@ func main() {
 }
 
 func handleConnection(connection net.Conn) {
-	fmt.Println("Dans handleConnection")
-	connection.Close()
-	fmt.Println("Sorti handleConnection")
+	defer connection.Close()
+
 }
