@@ -21,7 +21,7 @@ func main() {
 		if errconn != nil {
 			panic(errconn)
 		} else {
-			fmt.Print("Connection réussie")
+			fmt.Println("Connection réussie")
 		}
 		//On prend tout de suite en charge la connection
 		go handleConnection(conn)
