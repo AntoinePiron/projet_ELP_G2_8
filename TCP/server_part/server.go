@@ -1,15 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
-	"image"
 	"net"
 )
 
-//On va se créer le go object qu'on va envoyer
-type ImgForConn struct {
-	id      int
-	content image.Image
+type Message struct {
+	ID   string
+	Data string
 }
 
 func main() {
@@ -35,7 +35,31 @@ func main() {
 	}
 }
 
-func handleConnection(connection net.Conn) {
-	defer connection.Close()
+func handleConnection(conn net.Conn) {
+	defer conn.Close()
+	// create a temp buffer
+	tmp := make([]byte, 500)
+
+	// loop through the connection to read incoming connections. If you're doing by
+	// directional, you might want to make this into a seperate go routine
+	for {
+		_, err := conn.Read(tmp)
+		if err != nil {
+			break
+		}
+
+		// convert bytes into Buffer (which implements io.Reader/io.Writer)
+		tmpbuff := bytes.NewBuffer(tmp)
+		tmpstruct := new(Message)
+
+		// creates a decoder object
+		gobobj := gob.NewDecoder(tmpbuff)
+		// decodes buffer and unmarshals it into a Message struct
+		gobobj.Decode(tmpstruct)
+
+		// lets print out!
+		fmt.Println(tmpstruct)
+		return
+	}
 
 }

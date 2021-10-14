@@ -1,18 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"encoding/gob"
 	"fmt"
-	"image"
-	"image/jpeg"
 	"net"
 	"os"
 )
 
-//On va se créer le go object qu'on va envoyer
-type ImgForConn struct {
-	id      int
-	content image.Image
+type Message struct {
+	ID   string
+	Data string
 }
 
 func main() {
@@ -24,31 +22,19 @@ func main() {
 		fmt.Println("Connection réussie")
 	}
 
-	file, err := os.Open("koala.jpg")
-
-	defer file.Close()
-	if err != nil {
-		panic(err)
-	}
-
-	img, err := jpeg.Decode(file)
-	if err != nil {
-		panic(err)
-	}
-
-	toSend := ImgForConn{
-		0,
-		img,
-	}
-
-	sendStruct(conn, toSend)
+	sendStruct(conn)
 
 }
 
-func sendStruct(conn net.Conn, strct ImgForConn) {
+func sendStruct(conn net.Conn) {
+	// lets create the message we want to send accross
+	msg := Message{ID: "Yo", Data: "Hello"}
+	bin_buf := new(bytes.Buffer)
 
-	fmt.Println(strct)
-	enc := gob.NewEncoder(conn)
-	enc.Encode(strct)
+	// create a encoder object
+	gobobj := gob.NewEncoder(bin_buf)
+	// encode buffer and marshal it into a gob object
+	gobobj.Encode(msg)
 
+	conn.Write(bin_buf.Bytes())
 }
