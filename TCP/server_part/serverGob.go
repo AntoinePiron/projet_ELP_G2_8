@@ -8,8 +8,8 @@ import (
 )
 
 type Message struct {
-	ID   string
-	Data string
+	ID   int
+	Data []byte
 }
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 	// create a temp buffer
-	tmp := make([]byte, 500)
+	tmp := make([]byte, 1024)
 
 	// loop through the connection to read incoming connections. If you're doing by
 	// directional, you might want to make this into a seperate go routine
