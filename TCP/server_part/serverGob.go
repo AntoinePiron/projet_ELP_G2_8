@@ -9,7 +9,7 @@ import (
 
 type Message struct {
 	ID   int
-	Data []byte
+	Data string
 }
 
 func main() {
