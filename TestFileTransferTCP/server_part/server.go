@@ -25,6 +25,8 @@ const BUFFERSIZE = 1024
 //on définit le port comme une constante
 const PORT = ":10000"
 
+const SENDFILENAME = "changed.jpg"
+
 func main() {
 	//On ouvre dans un premier temps le serveur TCP e vérifiant qu'il n'y a pas d'erreur
 	server, err := net.Listen("tcp", PORT)
@@ -76,14 +78,14 @@ func handleConnection(connection net.Conn) {
 		}
 	}
 	wg.Wait()
-	outFile, err := os.Create("changed.jpg")
+	outFile, err := os.Create(SENDFILENAME)
 	if err != nil {
 		fmt.Println("Probleme l76", err)
 		return
 	}
 	defer outFile.Close()
 	jpeg.Encode(outFile, finalImg, nil)
-	sendFileToClient(connection, "changed.jpg")
+	sendFileToClient(connection, SENDFILENAME)
 }
 
 func sendFileToClient(conn net.Conn, name string) {

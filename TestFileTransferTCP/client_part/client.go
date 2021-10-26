@@ -11,6 +11,7 @@ import (
 
 const BUFFERSIZE = 1024
 const PORT = ":10000"
+const SENDFILENAME = "koala.jpg"
 
 func main() {
 	connection, err := net.Dial("tcp", PORT)
@@ -20,7 +21,7 @@ func main() {
 	defer connection.Close()
 	fmt.Println("Connected to server")
 
-	sendFileToServer(connection, "koala.jpg")
+	sendFileToServer(connection, SENDFILENAME)
 	receiveFileFromServer(connection)
 }
 
