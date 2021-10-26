@@ -20,21 +20,20 @@ func main() {
 	defer connection.Close()
 	fmt.Println("Connected to server")
 
+	sendFileToServer(connection, "koala.jpg")
 	receiveFileFromServer(connection)
 }
 
 func sendFileToServer(conn net.Conn, name string) {
-	//On oublie pas de defer la fermture de la connection pour qu'elle se ferme automatiquement à la fin de l'execution
-	defer conn.Close()
 	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
 	file, err := os.Open(name)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Probleme l31", err)
 		return
 	}
 	fileInfo, err := file.Stat()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Probleme l36", err)
 		return
 	}
 	fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
@@ -51,7 +50,7 @@ func sendFileToServer(conn net.Conn, name string) {
 		}
 		conn.Write(sendBuffer)
 	}
-	fmt.Println("File has been sent, closing connection!")
+	fmt.Println("File has been sent")
 	return
 }
 
@@ -66,9 +65,8 @@ func receiveFileFromServer(connection net.Conn) {
 	fileName := strings.Trim(string(bufferFileName), ":")
 
 	newFile, err := os.Create(fileName)
-
 	if err != nil {
-		panic(err)
+		fmt.Println("Probleme l70", err)
 	}
 	defer newFile.Close()
 	var receivedBytes int64
