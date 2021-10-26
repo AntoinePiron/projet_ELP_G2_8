@@ -46,7 +46,7 @@ func sendFileToClient(conn net.Conn) {
 	//On oublie pas de defer la fermture de la connection pour qu'elle se ferme automatiquement à la fin de l'execution
 	defer conn.Close()
 	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
-	file, err := os.Open("dummyfile.txt")
+	file, err := os.Open("koala.jpg")
 	if err != nil {
 		fmt.Println(err)
 		return
