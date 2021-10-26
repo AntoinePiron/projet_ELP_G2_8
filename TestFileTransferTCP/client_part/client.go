@@ -18,7 +18,44 @@ func main() {
 		panic(err)
 	}
 	defer connection.Close()
-	fmt.Println("Connected to server, start receiving the file name and file size")
+	fmt.Println("Connected to server")
+
+	receiveFileFromServer(connection)
+}
+
+func sendFileToServer(conn net.Conn, name string) {
+	//On oublie pas de defer la fermture de la connection pour qu'elle se ferme automatiquement à la fin de l'execution
+	defer conn.Close()
+	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
+	file, err := os.Open(name)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
+	fileName := fillString(fileInfo.Name(), 64)
+	fmt.Println("Sending filename and filesize!")
+	conn.Write([]byte(fileSize))
+	conn.Write([]byte(fileName))
+	sendBuffer := make([]byte, BUFFERSIZE)
+	fmt.Println("Start sending file!")
+	for {
+		_, err = file.Read(sendBuffer)
+		if err == io.EOF {
+			break
+		}
+		conn.Write(sendBuffer)
+	}
+	fmt.Println("File has been sent, closing connection!")
+	return
+}
+
+func receiveFileFromServer(connection net.Conn) {
 	bufferFileName := make([]byte, 64) //On fait correspondre les tailles avec l'envoie du cote server
 	bufferFileSize := make([]byte, 10)
 
@@ -46,38 +83,6 @@ func main() {
 		receivedBytes += BUFFERSIZE
 	}
 	fmt.Println("Received file completely!")
-}
-
-func sendFileToServer(conn net.Conn) {
-	//On oublie pas de defer la fermture de la connection pour qu'elle se ferme automatiquement à la fin de l'execution
-	defer conn.Close()
-	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
-	file, err := os.Open("koala.jpg")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fileInfo, err := file.Stat()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
-	fileName := fillString(fileInfo.Name(), 64)
-	fmt.Println("Sending filename and filesize!")
-	conn.Write([]byte(fileSize))
-	conn.Write([]byte(fileName))
-	sendBuffer := make([]byte, BUFFERSIZE)
-	fmt.Println("Start sending file!")
-	for {
-		_, err = file.Read(sendBuffer)
-		if err == io.EOF {
-			break
-		}
-		conn.Write(sendBuffer)
-	}
-	fmt.Println("File has been sent, closing connection!")
-	return
 }
 
 func fillString(retunString string, toLength int) string {

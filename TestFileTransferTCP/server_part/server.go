@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 )
 
 //This constant can be anything from 1 to 65495, because the TCP package can only contain up to 65495 bytes of payload.
@@ -72,6 +73,36 @@ func sendFileToClient(conn net.Conn) {
 	}
 	fmt.Println("File has been sent, closing connection!")
 	return
+}
+
+func receiveFileFromClient(connection net.Conn) {
+	bufferFileName := make([]byte, 64) //On fait correspondre les tailles avec l'envoie du cote server
+	bufferFileSize := make([]byte, 10)
+
+	connection.Read(bufferFileSize)
+	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
+
+	connection.Read(bufferFileName)
+	fileName := strings.Trim(string(bufferFileName), ":")
+
+	newFile, err := os.Create(fileName)
+
+	if err != nil {
+		panic(err)
+	}
+	defer newFile.Close()
+	var receivedBytes int64
+
+	for {
+		if (fileSize - receivedBytes) < BUFFERSIZE {
+			io.CopyN(newFile, connection, (fileSize - receivedBytes))
+			connection.Read(make([]byte, (receivedBytes+BUFFERSIZE)-fileSize))
+			break
+		}
+		io.CopyN(newFile, connection, BUFFERSIZE)
+		receivedBytes += BUFFERSIZE
+	}
+	fmt.Println("Received file completely!")
 }
 
 func fillString(retunString string, toLength int) string {
