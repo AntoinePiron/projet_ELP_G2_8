@@ -29,12 +29,12 @@ func sendFileToServer(conn net.Conn, name string) {
 	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
 	file, err := os.Open(name)
 	if err != nil {
-		fmt.Println("Probleme l31", err)
+		fmt.Println(err)
 		return
 	}
 	fileInfo, err := file.Stat()
 	if err != nil {
-		fmt.Println("Probleme l36", err)
+		fmt.Println(err)
 		return
 	}
 	fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
@@ -67,7 +67,7 @@ func receiveFileFromServer(connection net.Conn) {
 
 	newFile, err := os.Create(fileName)
 	if err != nil {
-		fmt.Println("Probleme l70", err)
+		fmt.Println(err)
 	}
 	defer newFile.Close()
 	var receivedBytes int64

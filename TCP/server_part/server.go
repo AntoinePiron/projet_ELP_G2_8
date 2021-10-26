@@ -56,13 +56,13 @@ func handleConnection(connection net.Conn) {
 	var wg sync.WaitGroup
 	imgFile, err := os.Open(receivedFileName)
 	if err != nil {
-		fmt.Println("Probleme l57", err)
+		fmt.Println(err)
 		return
 	}
 	defer imgFile.Close()
 	img, err := jpeg.Decode(imgFile)
 	if err != nil {
-		fmt.Println("Probleme l63", err)
+		fmt.Println(err)
 		return
 	}
 	finalImg := image.NewRGBA(img.Bounds())
@@ -80,7 +80,7 @@ func handleConnection(connection net.Conn) {
 	wg.Wait()
 	outFile, err := os.Create(SENDFILENAME)
 	if err != nil {
-		fmt.Println("Probleme l76", err)
+		fmt.Println(err)
 		return
 	}
 	defer outFile.Close()
@@ -92,7 +92,7 @@ func sendFileToClient(conn net.Conn, name string) {
 	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
 	file, err := os.Open(name)
 	if err != nil {
-		fmt.Println("Probleme l87", err)
+		fmt.Println(err)
 		return
 	}
 	fileInfo, err := file.Stat()
@@ -131,7 +131,7 @@ func receiveFileFromClient(connection net.Conn) string {
 	newFile, err := os.Create(fileName)
 
 	if err != nil {
-		fmt.Println("Probleme l126", err)
+		fmt.Println(err)
 	}
 	var receivedBytes int64
 
