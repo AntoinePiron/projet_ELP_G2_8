@@ -25,6 +25,7 @@ const BUFFERSIZE = 1024
 //on définit le port comme une constante
 const PORT = ":10000"
 
+//On définit egalement le nom du fichier d'envoie dans une constante pour le modifier uniquement ici et garder un cohérence dans le code
 const SENDFILENAME = "changed.jpg"
 
 func main() {
@@ -34,27 +35,148 @@ func main() {
 		fmt.Println("Problème lors de l'ouverture du serveur : ", err)
 		os.Exit(1)
 	}
-	//On defer la fermeture du server
+	//On defer la fermeture du server = on le ferme une fois le main terminé
 	defer server.Close()
 	fmt.Println("Ouverture du serveur réussie")
 	fmt.Println("En attente de connections ...")
-
+	//On créé un boucle infinie attendant les différents connections
 	for {
+		//On recpèère une connection et on gere une erreur si nécessaire
 		connection, err := server.Accept()
 		if err != nil {
 			fmt.Println("Problème lors de la connection du client : ", err)
+			continue
 		}
 		fmt.Println("Client connecté")
+		//Quand la connection à réussi on va la traiter avec une go routine
 		go handleConnection(connection)
 	}
 }
 
+/**
+La fonction qui permet de gérer chaque utilisateur
+paramètre :
+ - connection --> la connection de l'utilisateur de type net.Conn
+*/
 func handleConnection(connection net.Conn) {
+	//On ferme la connection une fois toutes la méthode finie
 	defer connection.Close()
+	//On traite le fichier et on récupère son nom
 	receivedFileName := receiveFileFromClient(connection)
+	//On s'occuper alors de modifier notre image
+	imageProcess(receivedFileName)
+	//une fois finit on renvoie la nouvelle image au client
+	sendFileToClient(connection, SENDFILENAME)
+}
 
+/**
+La fonction qui permet d'envoyer un fichier au client
+paramètres :
+ - conn --> la connection du client du type net.Conn
+ - name --> le nom du fichier à envoyer du type string
+*/
+func sendFileToClient(conn net.Conn, name string) {
+	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
+	file, err := os.Open(name)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//On recupère les statistiques du fichier
+	fileInfo, err := file.Stat()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//On récupère la taille et le nom du fichier pour les envoyer directement à l'utilisateur
+	fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
+	fileName := fillString(fileInfo.Name(), 64)
+	fmt.Println("Sending filename and filesize!")
+	conn.Write([]byte(fileSize))
+	conn.Write([]byte(fileName))
+
+	//Un fois réalisé on peut alors envoyer directement notre image bout par bout car on est limité à une certaine taille de buffer avec une connection TCP
+	sendBuffer := make([]byte, BUFFERSIZE)
+	fmt.Println("Start sending file!")
+	for {
+		_, err = file.Read(sendBuffer)
+		if err == io.EOF {
+			break
+		}
+		conn.Write(sendBuffer)
+	}
+	fmt.Println("File has been sent")
+	return
+}
+
+/**
+La fonction qui permet de recevoir un fichier du client
+paramètre :
+ - connection --> la connection du client du type net.Conn
+return :
+ - fileName --> le nom du fichier reçu
+*/
+func receiveFileFromClient(connection net.Conn) string {
+	//On recoit dans un premier temps le nom et la taille du fichier selon les tailles prédéfini (On remarquera qu'elles coresspondent également à notre envoie)
+	bufferFileName := make([]byte, 64)
+	bufferFileSize := make([]byte, 10)
+
+	connection.Read(bufferFileSize)
+	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
+
+	connection.Read(bufferFileName)
+	fileName := strings.Trim(string(bufferFileName), ":")
+
+	//On peut alors créerle fichier de sortie
+	newFile, err := os.Create(fileName)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	var receivedBytes int64
+	//On remplit alors ce fameux fichier avec les données reçu
+	for {
+		if (fileSize - receivedBytes) < BUFFERSIZE {
+			io.CopyN(newFile, connection, (fileSize - receivedBytes))
+			connection.Read(make([]byte, (receivedBytes+BUFFERSIZE)-fileSize))
+			break
+		}
+		io.CopyN(newFile, connection, BUFFERSIZE)
+		receivedBytes += BUFFERSIZE
+	}
+	fmt.Println("Received file completely!")
+	return fileName
+}
+
+/**
+Cette fonction est un peu particulière
+Elle permet de remplir un paquet avec la taille voulue si il n'est pas complet
+cad que si notre string ne fait que 10 bits alors qu'on veut emvoyer un paquet de 64bits cette fonction va se charger de le remplir avec le carac ":" pour atteindre la taille souhaité
+paramètre :
+ - returnString --> notre string de base qu'on veut "épaissir"
+ - toLength --> la longueur souhaitée
+*/
+func fillString(returnString string, toLength int) string {
+	for {
+		lengtString := len(returnString)
+		if lengtString < toLength {
+			returnString = returnString + ":"
+			continue
+		}
+		break
+	}
+	return returnString
+}
+
+/**
+La fonction qui permet de déclencher le traitement de l'image en la sous-traitant avec plusieurs go routines
+elle est détallé dans le dossier /image_bw_routine pour la comprendre
+paramètre :
+ - imageName --> le nom de l'image reçu de l'utilisateur
+*/
+func imageProcess(imageName string) {
 	var wg sync.WaitGroup
-	imgFile, err := os.Open(receivedFileName)
+	imgFile, err := os.Open(imageName)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -85,82 +207,19 @@ func handleConnection(connection net.Conn) {
 	}
 	defer outFile.Close()
 	jpeg.Encode(outFile, finalImg, nil)
-	sendFileToClient(connection, SENDFILENAME)
 }
 
-func sendFileToClient(conn net.Conn, name string) {
-	//On ouvre le fichier et si jamais une erreur se produit on arrete la fonction avec le mot cle return
-	file, err := os.Open(name)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fileInfo, err := file.Stat()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fileSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
-	fileName := fillString(fileInfo.Name(), 64)
-	fmt.Println("Sending filename and filesize!")
-	conn.Write([]byte(fileSize))
-	conn.Write([]byte(fileName))
-	sendBuffer := make([]byte, BUFFERSIZE)
-	fmt.Println("Start sending file!")
-	for {
-		_, err = file.Read(sendBuffer)
-		if err == io.EOF {
-			break
-		}
-		conn.Write(sendBuffer)
-	}
-	fmt.Println("File has been sent")
-	return
-}
-
-func receiveFileFromClient(connection net.Conn) string {
-	bufferFileName := make([]byte, 64) //On fait correspondre les tailles avec l'envoie du cote server
-	bufferFileSize := make([]byte, 10)
-
-	connection.Read(bufferFileSize)
-	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
-
-	connection.Read(bufferFileName)
-	fileName := strings.Trim(string(bufferFileName), ":")
-
-	newFile, err := os.Create(fileName)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	var receivedBytes int64
-
-	for {
-		if (fileSize - receivedBytes) < BUFFERSIZE {
-			io.CopyN(newFile, connection, (fileSize - receivedBytes))
-			connection.Read(make([]byte, (receivedBytes+BUFFERSIZE)-fileSize))
-			break
-		}
-		io.CopyN(newFile, connection, BUFFERSIZE)
-		receivedBytes += BUFFERSIZE
-	}
-	fmt.Println("Received file completely!")
-	return fileName
-}
-
-func fillString(retunString string, toLength int) string {
-	for {
-		lengtString := len(retunString)
-		if lengtString < toLength {
-			retunString = retunString + ":"
-			continue
-		}
-		break
-	}
-	return retunString
-}
-
-//La fonction qui analyse l'image
+/**
+La fonction qui analyse une portion de l'image
+paramètres :
+ - upleftx --> La coordonné x du coin haut gauche de la zone à traiter
+ - uplefty --> La coordonné y du coin haut gauche de la zone à traiter
+ - width --> la largeur de la zone à traiter
+ - height --> la hauteur de la zone à traiter
+ - input --> l'image de base
+ - final --> l'image de sortie ou on va écrire les nouveaux pixels
+ - wg --> le waitgroup permettant de gérer les go routines
+*/
 func analyze(upleftx int, uplefty int, width int, height int, input image.Image, final *image.RGBA, wg *sync.WaitGroup) {
 	//Le double for permet de se déplacer parmi tt les pixels de la zone
 	for x := upleftx; x < upleftx+width; x++ {
