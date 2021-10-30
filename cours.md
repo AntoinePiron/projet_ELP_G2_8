@@ -127,5 +127,10 @@ Pour tranférer image &rarr; envoyer un go object pour se simplifier la vie. Le 
 Pour se familiariser avec le transfer de structure on s'est alors basé sur le code disponible [ici](https://gist.github.com/MilosSimic/ae7fe8d70866e89dbd6e84d86dc8d8d5) qui nous a permis de comprendre comment envoyer une structure assez simple. Notre but va alors de bien comprendre et tranformer ce code afin de pouvoir tranférer des images sur le server TCP.  
 
 ## Travail en autonomie pendant les vacances 
-A la fin de la dernière séance nous avions réussi à transférer des structures Go via une connection TCP. Cepandant il s'agissait de structures simples composé de String.  
-Lors de tentative de transfert d'image (un peu bourrin, on a juste remplacé le string par un image.Image) l'image était vide a la réception, on recevait une structure <nil> 
+> A la fin de la dernière séance nous avions réussi à transférer des structures Go via une connection TCP. Cepandant il s'agissait de structures simples composé de String.  
+> Lors de tentative de transfert d'image (un peu bourrin, on a juste remplacé le string par un image.Image) l'image était vide a la réception, on recevait une structure `nil`.
+
+Pendant les vacances nous avons donc essayé de revenir sur ce blocage et comprendre pouquoi la structure arrivait vide. Pour cela nous avons fait des recherches sur le fonctionnement même d'une connection TCP mais également sur notre manière de transférer des données.   
+Pour répondre à ces questions nous nous sommes grandement inspiré de [ce site](https://mrwaggel.be/post/golang-transfer-a-file-over-a-tcp-socket/) qui nous a été d'une grande aide.  
+Il nous a tout d'abord permis de comprendre qu'une connection TCP effectue des transfert de paquet d'une certaine taille. Or on essayait d'envoyer toute l'image d'un coup en un message ce qui est juste impossible.   
+Il faut alors envoyer les données sur plusieurs paquet pour pouvoir reconstituer à l'arrivé.
