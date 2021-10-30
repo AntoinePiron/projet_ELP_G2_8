@@ -124,4 +124,8 @@ func main(){
 ```
 On va alors adapter cela à notre code.      
 Pour tranférer image &rarr; envoyer un go object pour se simplifier la vie. Le seul "inconvénient" est qu'il faut que le serveur et le client soient en golang.   
-Pour se familiariser avec le transfer de structure on s'est alors basé sur le code disponible [ici](https://gist.github.com/MilosSimic/ae7fe8d70866e89dbd6e84d86dc8d8d5) qui nous a permis de comprendre comment envoyer une structure assez simple. Notre but va alors de bien comprendre et tranformer ce code afin de pouvoir tranférer des images sur le server TCP.   
+Pour se familiariser avec le transfer de structure on s'est alors basé sur le code disponible [ici](https://gist.github.com/MilosSimic/ae7fe8d70866e89dbd6e84d86dc8d8d5) qui nous a permis de comprendre comment envoyer une structure assez simple. Notre but va alors de bien comprendre et tranformer ce code afin de pouvoir tranférer des images sur le server TCP.  
+
+## Travail en autonomie pendant les vacances 
+A la fin de la dernière séance nous avions réussi à transférer des structures Go via une connection TCP. Cepandant il s'agissait de structures simples composé de String.  
+Lors de tentative de transfert d'image (un peu bourrin, on a juste remplacé le string par un image.Image) l'image était vide a la réception, on recevait une structure <nil> 
