@@ -133,6 +133,8 @@ func receiveFileFromClient(connection net.Conn) string {
 	if err != nil {
 		fmt.Println(err)
 	}
+	/**Initialize a 64 bit integer that will keep count of how many bytes we have
+	received so far, so we can tell when to stop reading the chunks from the server.*/
 	var receivedBytes int64
 	//On remplit alors ce fameux fichier avec les données reçu
 	for {

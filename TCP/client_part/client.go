@@ -1,3 +1,10 @@
+/**
+Code très largement inspiré du blog suivant :
+https://mrwaggel.be/post/golang-transfer-a-file-over-a-tcp-socket/
+La partie vlient utilise globalement les mêmes méthodes que la partie serveur, les méthodes sont donc détaillé dans
+la partie serveur
+*/
+
 package main
 
 import (
