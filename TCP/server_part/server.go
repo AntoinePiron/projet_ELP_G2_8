@@ -138,13 +138,14 @@ func receiveFileFromClient(connection net.Conn) string {
 	var receivedBytes int64
 	//On remplit alors ce fameux fichier avec les données reçu
 	for {
-		if (fileSize - receivedBytes) < BUFFERSIZE {
+		if (fileSize - receivedBytes) <= BUFFERSIZE {
 			io.CopyN(newFile, connection, (fileSize - receivedBytes))
 			connection.Read(make([]byte, (receivedBytes+BUFFERSIZE)-fileSize))
 			break
 		}
 		io.CopyN(newFile, connection, BUFFERSIZE)
 		receivedBytes += BUFFERSIZE
+		fmt.Println((fileSize - receivedBytes))
 	}
 	fmt.Println("Received file completely!")
 	return fileName

@@ -134,3 +134,5 @@ Pendant les vacances nous avons donc essayé de revenir sur ce blocage et compre
 Pour répondre à ces questions nous nous sommes grandement inspiré de [ce site](https://mrwaggel.be/post/golang-transfer-a-file-over-a-tcp-socket/) qui nous a été d'une grande aide.  
 Il nous a tout d'abord permis de comprendre qu'une connection TCP effectue des transfert de paquet d'une certaine taille. Or on essayait d'envoyer toute l'image d'un coup en un message ce qui est juste impossible.   
 Il faut alors envoyer les données sur plusieurs paquet pour pouvoir reconstituer à l'arrivé.
+
+A noter : bug dans le server. Cas particulier où (fileSize - receivedBytes) == 1024 dans la méthode receiveFileFromClient. Cela engendre un blocage.
