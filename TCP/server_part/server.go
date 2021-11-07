@@ -25,9 +25,6 @@ const BUFFERSIZE = 1024
 //on définit le port comme une constante
 const PORT = ":10000"
 
-//On définit egalement le nom du fichier d'envoie dans une constante pour le modifier uniquement ici et garder un cohérence dans le code
-const SENDFILENAME = "changed.jpg"
-
 func main() {
 	//On ouvre dans un premier temps le serveur TCP e vérifiant qu'il n'y a pas d'erreur
 	server, err := net.Listen("tcp", PORT)
@@ -39,6 +36,7 @@ func main() {
 	defer server.Close()
 	fmt.Println("Ouverture du serveur réussie")
 	fmt.Println("En attente de connections ...")
+	numberOfConnections := 0
 	//On créé un boucle infinie attendant les différents connections
 	for {
 		//On recpèère une connection et on gere une erreur si nécessaire
@@ -48,8 +46,9 @@ func main() {
 			continue
 		}
 		fmt.Println("Client connecté")
+		numberOfConnections += 1
 		//Quand la connection à réussi on va la traiter avec une go routine
-		go handleConnection(connection)
+		go handleConnection(connection, numberOfConnections)
 	}
 }
 
@@ -58,15 +57,16 @@ La fonction qui permet de gérer chaque utilisateur
 paramètre :
  - connection --> la connection de l'utilisateur de type net.Conn
 */
-func handleConnection(connection net.Conn) {
+func handleConnection(connection net.Conn, numberOfConnections int) {
+	outName := "changed_" + strconv.Itoa(numberOfConnections) + ".jpg"
 	//On ferme la connection une fois toutes la méthode finie
 	defer connection.Close()
 	//On traite le fichier et on récupère son nom
 	receivedFileName := receiveFileFromClient(connection)
 	//On s'occuper alors de modifier notre image
-	imageProcess(receivedFileName)
+	imageProcess(receivedFileName, outName)
 	//une fois finit on renvoie la nouvelle image au client
-	sendFileToClient(connection, SENDFILENAME)
+	sendFileToClient(connection, outName)
 }
 
 /**
@@ -176,7 +176,7 @@ elle est détallé dans le dossier /image_bw_routine pour la comprendre
 paramètre :
  - imageName --> le nom de l'image reçu de l'utilisateur
 */
-func imageProcess(imageName string) {
+func imageProcess(imageName string, outName string) {
 	var wg sync.WaitGroup
 	imgFile, err := os.Open(imageName)
 	if err != nil {
@@ -202,7 +202,7 @@ func imageProcess(imageName string) {
 		}
 	}
 	wg.Wait()
-	outFile, err := os.Create(SENDFILENAME)
+	outFile, err := os.Create(outName)
 	if err != nil {
 		fmt.Println(err)
 		return

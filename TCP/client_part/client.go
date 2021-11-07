@@ -18,9 +18,15 @@ import (
 
 const BUFFERSIZE = 1024
 const PORT = ":10000"
-const SENDFILENAME = "koala.jpg"
 
 func main() {
+	sendFileName := ""
+	if len(os.Args) > 1 {
+		sendFileName = os.Args[1]
+	} else {
+		println("Please indicate a filename")
+		os.Exit(1)
+	}
 	connection, err := net.Dial("tcp", PORT)
 	if err != nil {
 		panic(err)
@@ -28,7 +34,7 @@ func main() {
 	defer connection.Close()
 	fmt.Println("Connected to server")
 
-	sendFileToServer(connection, SENDFILENAME)
+	sendFileToServer(connection, sendFileName)
 	receiveFileFromServer(connection)
 }
 
