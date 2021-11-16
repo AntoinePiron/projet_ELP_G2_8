@@ -37,6 +37,7 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 }
 
 func main() {
+	//Vérification de l'argument de l'utilisateur
 	if len(os.Args) < 2 {
 		fmt.Println("Veuillez rentrer un argument")
 		os.Exit(1)
