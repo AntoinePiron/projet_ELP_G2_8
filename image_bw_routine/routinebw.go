@@ -6,7 +6,6 @@ import (
 	"image/color"
 	"image/jpeg"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"sync"
@@ -38,13 +37,6 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 	wg.Done()
 }
 
-func isPowerOfTwo(x int) bool {
-	for ((x % 2) == 0) && x > 1 {
-		x /= 2
-	}
-	return x == 1
-}
-
 func main() {
 	//Vérification de l'argument de l'utilisateur
 	if len(os.Args) < 3 {
@@ -56,12 +48,10 @@ func main() {
 		fmt.Println("Input incorrecte")
 		os.Exit(1)
 	}
-	if nbDiv <= 0 || !(isPowerOfTwo(nbDiv)) {
-		fmt.Println("Veuillez rentrer une valeur positive de division qui est une puissance de deux")
+	if nbDiv <= 0 {
+		fmt.Println("Veuillez rentrer une valeur positive de division")
 		os.Exit(1)
 	}
-
-	nbDiv = int(math.Sqrt(float64(nbDiv)))
 	filename := os.Args[2]
 	var wg sync.WaitGroup //On initialise notre waitgroup pour notre travail de goroutine par la suite
 
@@ -82,18 +72,15 @@ func main() {
 	finalImg := image.NewRGBA(img.Bounds())
 	//il s'agit ici de la longueur d'une sous section
 	x := img.Bounds().Max.X / nbDiv
-	//Il s'agit ici de la largeur d'une sous section
-	y := img.Bounds().Max.Y / nbDiv
+	//Il s'agit ici de la largeur
+	y := img.Bounds().Max.Y
 	//On va sauvegarder le tps avant l'execution des go routines pour voir le temps d'execution du programme
 	startTime := time.Now()
 	//Le double for va permettre de lancer les différentes go routines pour les sous segments
 	for i := 0; i < nbDiv; i++ {
-		for j := 0; j < nbDiv; j++ {
-			//On oublie pas d'ajouter au waitGroup
-			wg.Add(1)
-			//On lance notre go routine
-			go analyze(x*i, y*j, img.Bounds().Dx()/nbDiv, img.Bounds().Dy()/nbDiv, img, finalImg, &wg)
-		}
+		wg.Add(1)
+		//On lance notre go routine
+		go analyze(x*i, 0, img.Bounds().Dx()/nbDiv, y, img, finalImg, &wg)
 	}
 	//Le wait va permettre d'eviter l'avancée du programme tant que toutes les go routines ne se sont pas executé
 	//Cela permet d'être sur que l'image est bien constitué en entier et au'on peut l'exporter
