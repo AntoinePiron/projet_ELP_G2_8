@@ -7,6 +7,7 @@ import (
 	"image/jpeg"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -36,6 +37,19 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Veuillez rentrer un argument")
+		os.Exit(1)
+	}
+	nbDiv, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		fmt.Println("Input incorrecte")
+		os.Exit(1)
+	}
+	if nbDiv <= 0 {
+		fmt.Println("Veuillez rentrer une valeur positive de division")
+		os.Exit(1)
+	}
 	var wg sync.WaitGroup //On initialise notre waitgroup pour notre travail de goroutine par la suite
 
 	//Ce premier bloc permet d'ouvrir notre image sous forme de file et de vérifier au'il n'y a aucune erreur
@@ -53,8 +67,6 @@ func main() {
 
 	//On vient créer une image vide faisant la même taille que l'image d'origine
 	finalImg := image.NewRGBA(img.Bounds())
-	//On va définir alors une constante correspondant au nombres de division souhaité cad le nb de go routines qu'on va lancer
-	const nbDiv = 8
 	//il s'agit ici de la longueur d'une sous section
 	x := img.Bounds().Max.X / nbDiv
 	//Il s'agit ici de la largeur d'une sous section
