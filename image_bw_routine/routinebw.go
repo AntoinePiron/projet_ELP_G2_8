@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/jpeg"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"sync"
@@ -17,6 +18,7 @@ Cette fonction va nous permettre d'analyser un bout de l'image à l'intérieur d
 On indique également le fichier d'entrée et de sortie
 */
 func analyze(upleftx int, uplefty int, width int, height int, input image.Image, final *image.RGBA, wg *sync.WaitGroup) {
+	fmt.Println("GO")
 	//Le double for permet de se déplacer parmi tt les pixels de la zone
 	for x := upleftx; x < upleftx+width; x++ {
 		for y := uplefty; y < uplefty+height; y++ {
@@ -36,6 +38,13 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 	wg.Done()
 }
 
+func isPowerOfTwo(x int) bool {
+	for ((x % 2) == 0) && x > 1 {
+		x /= 2
+	}
+	return x == 1
+}
+
 func main() {
 	//Vérification de l'argument de l'utilisateur
 	if len(os.Args) < 3 {
@@ -47,10 +56,12 @@ func main() {
 		fmt.Println("Input incorrecte")
 		os.Exit(1)
 	}
-	if nbDiv <= 0 {
-		fmt.Println("Veuillez rentrer une valeur positive de division")
+	if nbDiv <= 0 || !(isPowerOfTwo(nbDiv)) {
+		fmt.Println("Veuillez rentrer une valeur positive de division qui est une puissance de deux")
 		os.Exit(1)
 	}
+
+	nbDiv = int(math.Sqrt(float64(nbDiv)))
 	filename := os.Args[2]
 	var wg sync.WaitGroup //On initialise notre waitgroup pour notre travail de goroutine par la suite
 
