@@ -38,8 +38,8 @@ func analyze(upleftx int, uplefty int, width int, height int, input image.Image,
 
 func main() {
 	//Vérification de l'argument de l'utilisateur
-	if len(os.Args) < 2 {
-		fmt.Println("Veuillez rentrer un argument")
+	if len(os.Args) < 3 {
+		fmt.Println("Veuillez deux arguments : nombres de divisions et nom de fichier")
 		os.Exit(1)
 	}
 	nbDiv, err := strconv.Atoi(os.Args[1])
@@ -51,10 +51,11 @@ func main() {
 		fmt.Println("Veuillez rentrer une valeur positive de division")
 		os.Exit(1)
 	}
+	filename := os.Args[2]
 	var wg sync.WaitGroup //On initialise notre waitgroup pour notre travail de goroutine par la suite
 
 	//Ce premier bloc permet d'ouvrir notre image sous forme de file et de vérifier au'il n'y a aucune erreur
-	file, err := os.Open("testFAT.JPG")
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
