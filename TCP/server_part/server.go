@@ -192,14 +192,12 @@ func imageProcess(imageName string, outName string) {
 	finalImg := image.NewRGBA(img.Bounds())
 	const nbDiv = 8
 	x := img.Bounds().Max.X / nbDiv
-	y := img.Bounds().Max.Y / nbDiv
+	y := img.Bounds().Max.Y
 	for i := 0; i < nbDiv; i++ {
-		for j := 0; j < nbDiv; j++ {
-			//On oublie pas d'ajouter au waitGroup
-			wg.Add(1)
-			//On lance notre go routine
-			go analyze(x*i, y*j, img.Bounds().Dx()/nbDiv, img.Bounds().Dy()/nbDiv, img, finalImg, &wg)
-		}
+		//On oublie pas d'ajouter au waitGroup
+		wg.Add(1)
+		//On lance notre go routine
+		go analyze(x*i, y, img.Bounds().Dx()/nbDiv, img.Bounds().Dy()/nbDiv, img, finalImg, &wg)
 	}
 	wg.Wait()
 	outFile, err := os.Create(outName)
