@@ -11,7 +11,12 @@ import (
 )
 
 func main() {
-	file, err := os.Open("testFAT.JPG")
+	if len(os.Args) < 2 {
+		fmt.Println("Veuillez renseigner un nom de fichier")
+		os.Exit(1)
+	}
+	sendFileName := os.Args[1]
+	file, err := os.Open(sendFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
