@@ -17,17 +17,24 @@ import (
 )
 
 const BUFFERSIZE = 1024
-const PORT = ":10000"
 
 func main() {
 	sendFileName := ""
-	if len(os.Args) > 1 {
-		sendFileName = os.Args[1]
-	} else {
-		println("Please indicate a filename")
+	if len(os.Args) < 3 {
+		fmt.Println("Veuillez deux arguments : port et nom de fichier")
 		os.Exit(1)
 	}
-	connection, err := net.Dial("tcp", PORT)
+	port, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		fmt.Println("Port incorrect")
+		os.Exit(1)
+	}
+	if port <= 1024 {
+		fmt.Println("Veuillez rentrer une valeur compatible de port (>1024)")
+		os.Exit(1)
+	}
+	sendFileName = os.Args[2]
+	connection, err := net.Dial("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		panic(err)
 	}

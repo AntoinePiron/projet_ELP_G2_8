@@ -18,16 +18,38 @@ import (
 	"sync"
 )
 
-//This constant can be anything from 1 to 65495, because the TCP package can only contain up to 65495 bytes of payload.
-//It will define how big the chunks are of the file that we will send in bytes.
 const BUFFERSIZE = 1024
 
-//on définit le port comme une constante
-const PORT = ":10000"
+var nbGoRoutine = 0
 
 func main() {
+	//Vérification de l'argument de l'utilisateur
+	if len(os.Args) < 3 {
+		fmt.Println("Veuillez deux arguments : port et nb de go routine")
+		os.Exit(1)
+	}
+	port, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		fmt.Println("Port incorrect")
+		os.Exit(1)
+	}
+	if port <= 1024 {
+		fmt.Println("Veuillez rentrer une valeur compatible de port (>1024)")
+		os.Exit(1)
+	}
+
+	nbGoRoutine, err = strconv.Atoi(os.Args[2])
+	if err != nil {
+		fmt.Println("nombre go routine incorrect")
+		os.Exit(1)
+	}
+	if nbGoRoutine < 1 {
+		fmt.Println("Veuillez rentrer une valeur positive de go routines")
+		os.Exit(1)
+	}
+
 	//On ouvre dans un premier temps le serveur TCP e vérifiant qu'il n'y a pas d'erreur
-	server, err := net.Listen("tcp", PORT)
+	server, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		fmt.Println("Problème lors de l'ouverture du serveur : ", err)
 		os.Exit(1)
@@ -190,14 +212,13 @@ func imageProcess(imageName string, outName string) {
 		return
 	}
 	finalImg := image.NewRGBA(img.Bounds())
-	const nbDiv = 8
-	x := img.Bounds().Max.X / nbDiv
+	x := img.Bounds().Max.X / nbGoRoutine
 	y := img.Bounds().Max.Y
-	for i := 0; i < nbDiv; i++ {
+	for i := 0; i < nbGoRoutine; i++ {
 		//On oublie pas d'ajouter au waitGroup
 		wg.Add(1)
 		//On lance notre go routine
-		go analyze(x*i, y, img.Bounds().Dx()/nbDiv, img.Bounds().Dy()/nbDiv, img, finalImg, &wg)
+		go analyze(x*i, 0, img.Bounds().Dx()/nbGoRoutine, y, img, finalImg, &wg)
 	}
 	wg.Wait()
 	outFile, err := os.Create(outName)

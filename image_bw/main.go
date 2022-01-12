@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-type ImageSet interface {
-	Set(x, y int, c color.Color)
-}
-
 func main() {
 	file, err := os.Open("testFAT.JPG")
 	if err != nil {
